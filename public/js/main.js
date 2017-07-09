@@ -21177,7 +21177,7 @@ var List = React.createClass({
 
 		return React.createElement(
 			'ul',
-			null,
+			{ className: 'list-group' },
 			this.props.items.map(createItem)
 		);
 	}
@@ -21185,28 +21185,123 @@ var List = React.createClass({
 
 module.exports = List;
 
-},{"./ListItem.jsx":185,"react":183}],185:[function(require,module,exports){
+},{"./ListItem.jsx":186,"react":183}],185:[function(require,module,exports){
+var React = require('react');
+var ListManager = require('./ListManager.jsx');
+
+var ListComposer = React.createClass({
+	displayName: 'ListComposer',
+
+	getInitialState: function () {
+		return { todos: [], todoTitle: '' };
+	},
+	handleSubmit: function (event) {
+		event.preventDefault();
+
+		console.log(this.state.todoTitle);
+		if (this.state.todoTitle != '') {
+			var currentTodo = this.state.todos;
+			currentTodo.push(this.state.todoTitle);
+
+			this.setState({ todos: currentTodo, todoTitle: '' });
+		}
+	},
+	onChange: function (event) {
+		this.setState({ todoTitle: event.target.value });
+	},
+	render: function () {
+
+		var createItem = function (text, index) {
+			return React.createElement(ListManager, { key: index + text, title: text });
+		};
+
+		return React.createElement(
+			'div',
+			null,
+			React.createElement(
+				'nav',
+				{ className: 'navbar navbar-default' },
+				React.createElement(
+					'div',
+					{ className: 'container-fluid' },
+					React.createElement(
+						'div',
+						{ className: 'navbar-header' },
+						React.createElement(
+							'button',
+							{ type: 'button', className: 'navbar-toggle collapsed', 'data-toggle': 'collapse', 'data-target': '#bs-example-navbar-collapse-1', 'aria-expanded': 'false' },
+							React.createElement(
+								'span',
+								{ className: 'sr-only' },
+								'Toggle navigation'
+							),
+							React.createElement('span', { className: 'icon-bar' }),
+							React.createElement('span', { className: 'icon-bar' }),
+							React.createElement('span', { className: 'icon-bar' })
+						),
+						React.createElement(
+							'a',
+							{ className: 'navbar-brand', href: '#' },
+							'ToDo Factory'
+						)
+					),
+					React.createElement(
+						'div',
+						{ className: 'collapse navbar-collapse', id: 'bs-example-navbar-collapse-1' },
+						React.createElement(
+							'form',
+							{ className: 'navbar-form navbar-right', onSubmit: this.handleSubmit },
+							React.createElement(
+								'div',
+								{ className: 'form-group' },
+								React.createElement(
+									'div',
+									{ className: 'input-group' },
+									React.createElement('input', { type: 'text', className: 'form-control', placeholder: 'Todo List Title', onChange: this.onChange, value: this.state.todoTitle }),
+									React.createElement(
+										'span',
+										{ className: 'input-group-btn' },
+										React.createElement(
+											'button',
+											{ type: 'submit', className: 'btn btn-success' },
+											'Create'
+										)
+									)
+								)
+							)
+						)
+					)
+				)
+			),
+			React.createElement(
+				'div',
+				{ className: 'container', id: 'todo-container' },
+				this.state.todos.map(createItem)
+			)
+		);
+	}
+});
+
+module.exports = ListComposer;
+
+},{"./ListManager.jsx":187,"react":183}],186:[function(require,module,exports){
 var React = require('react');
 
 var ListItem = React.createClass({
-	displayName: 'ListItem',
+	displayName: "ListItem",
 
 	render: function () {
 		return React.createElement(
-			'li',
-			null,
-			React.createElement(
-				'h4',
-				null,
-				this.props.text
-			)
+			"li",
+			{ className: "list-group-item" },
+			this.props.text
 		);
 	}
 });
 
 module.exports = ListItem;
 
-},{"react":183}],186:[function(require,module,exports){
+},{"react":183}],187:[function(require,module,exports){
 var React = require('react');
 var List = require('./List.jsx');
 
@@ -21218,47 +21313,72 @@ var ListManager = React.createClass({
 	},
 	handleSubmit: function (event) {
 		event.preventDefault();
+		if (this.state.newItemText != '') {
+			var currentItems = this.state.items;
+			currentItems.push(this.state.newItemText);
 
-		var currentItems = this.state.items;
-		currentItems.push(this.state.newItemText);
-
-		this.setState({ items: currentItems, newItemText: '' });
+			this.setState({ items: currentItems, newItemText: '' });
+		}
 	},
 	onChange: function (event) {
 		this.setState({ newItemText: event.target.value });
 	},
 	render: function () {
+
+		var divStyle = {
+			marginTop: 10
+		};
+
 		return React.createElement(
 			'div',
-			null,
+			{ style: divStyle, className: 'col-sm-4' },
 			React.createElement(
-				'h3',
-				null,
-				this.props.title
-			),
-			React.createElement(
-				'form',
-				{ onSubmit: this.handleSubmit },
-				React.createElement('input', { type: 'text', onChange: this.onChange, value: this.state.newItemText }),
+				'div',
+				{ className: 'panel panel-default' },
 				React.createElement(
-					'button',
-					null,
-					'Add'
-				)
-			),
-			React.createElement(List, { items: this.state.items })
+					'div',
+					{ className: 'panel-heading' },
+					this.props.title
+				),
+				React.createElement(
+					'div',
+					{ className: 'panel-body' },
+					React.createElement(
+						'form',
+						{ className: 'form', onSubmit: this.handleSubmit },
+						React.createElement(
+							'div',
+							{ className: 'input-group' },
+							React.createElement('input', { className: 'form-control', type: 'text', onChange: this.onChange, value: this.state.newItemText }),
+							React.createElement(
+								'span',
+								{ className: 'input-group-btn' },
+								React.createElement(
+									'button',
+									{ className: 'btn btn-primary' },
+									'Add'
+								)
+							)
+						)
+					)
+				),
+				React.createElement(List, { items: this.state.items })
+			)
 		);
 	}
 });
 
 module.exports = ListManager;
 
-},{"./List.jsx":184,"react":183}],187:[function(require,module,exports){
+},{"./List.jsx":184,"react":183}],188:[function(require,module,exports){
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var ListManager = require('./components/ListManager.jsx');
+var ListComposer = require('./components/ListComposer.jsx');
+ReactDOM.render(React.createElement(ListComposer, null), document.getElementById('todocomposer'));
 
-ReactDOM.render(React.createElement(ListManager, { title: 'Ingredients ' }), document.getElementById('ingredients'));
+//var ListManager = require('./components/ListManager.jsx');
 
-},{"./components/ListManager.jsx":186,"react":183,"react-dom":31}]},{},[187]);
+//ReactDOM.render(<ListManager title="Ingredients " />, document.getElementById('ingredients'));
+
+},{"./components/ListComposer.jsx":185,"react":183,"react-dom":31}]},{},[188]);
